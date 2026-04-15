@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TherapyFind — AI-Powered Therapist Matching in Canada</title>
+  <meta name="description" content="TherapyFind uses AI powered by Claude to match you with the right registered therapist across Canada. Just describe what you need."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- AI Processing Overlay -->
+<div id="ai-processing-overlay">
+  <div class="processing-card">
+    <div class="processing-logo">
+      <svg viewBox="0 0 32 32" width="32" height="32" fill="none">
+        <circle cx="16" cy="16" r="14" fill="var(--primary)" opacity=".15"/>
+        <path d="M10 16 C10 12 13 9 16 9 C19 9 22 12 22 16" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M8 16 L24 16" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M16 16 L16 24" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="12" cy="22" r="2" fill="var(--primary)" opacity=".6"/>
+        <circle cx="20" cy="22" r="2" fill="var(--primary)" opacity=".6"/>
+      </svg>
+    </div>
+    <div class="processing-spinner"></div>
+    <div id="processing-msg" class="processing-msg">Understanding your needs...</div>
+    <div class="processing-dots"><span></span><span></span><span></span></div>
+    <p class="processing-sub">AI Matching &bull; Powered by Claude</p>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav id="navbar">
+  <div class="inner">
+    <div class="logo" onclick="showPage('home')" style="cursor:pointer">
+      <svg viewBox="0 0 32 32" width="26" height="26" fill="none">
+        <circle cx="16" cy="16" r="14" fill="currentColor" opacity=".12" style="color:var(--primary)"/>
+        <path d="M10 16 C10 12 13 9 16 9 C19 9 22 12 22 16" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M8 16 L24 16" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M16 16 L16 24" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="12" cy="22" r="2" fill="var(--primary)" opacity=".6"/>
+        <circle cx="20" cy="22" r="2" fill="var(--primary)" opacity=".6"/>
+      </svg>
+      <span>Therapy<span class="accent">Find</span></span>
+      <span class="nav-ai-badge">AI-Powered</span>
+    </div>
+    <div class="nav-links" id="nav-links">
+      <a onclick="showPage('directory');closeMenu()">Find a Therapist</a>
+      <a onclick="document.getElementById('how')?.scrollIntoView({behavior:'smooth'});closeMenu()">How It Works</a>
+      <a onclick="document.getElementById('events')?.scrollIntoView({behavior:'smooth'});closeMenu()">Events</a>
+      <span class="nav-claude-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Powered by Claude
+      </span>
+      <button class="theme-toggle theme-toggle-desktop" onclick="toggleTheme()" title="Toggle dark mode">
+        <svg id="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+    <div class="nav-mobile-right">
+      <button class="theme-toggle theme-toggle-mobile" onclick="toggleTheme()" title="Toggle dark mode">
+        <svg id="theme-icon-mobile" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HOME PAGE ═══════════════════════════ -->
+<div id="home-page">
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-badge">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      AI-Powered Matching &mdash; In Partnership with Claude
+    </div>
+    <h1 class="hero-title">Find your therapist.<br><span class="c">Just tell us what you need.</span></h1>
+    <p class="hero-sub">Our AI, powered by Claude, listens to what you're going through and instantly surfaces registered therapists across Canada who are the right fit for you.</p>
+
+    <!-- AI Chat Interface -->
+    <div class="ai-chat-wrap">
+      <div class="ai-greeting">
+        <div class="ai-avatar-outer">
+          <div class="ai-avatar-icon">
+            <svg viewBox="0 0 32 32" width="20" height="20" fill="none">
+              <path d="M10 16 C10 12 13 9 16 9 C19 9 22 12 22 16" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M8 16 L24 16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M16 16 L16 24" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="12" cy="22" r="2" fill="white" opacity=".7"/>
+              <circle cx="20" cy="22" r="2" fill="white" opacity=".7"/>
+            </svg>
+          </div>
+          <div class="ai-pulse-ring"></div>
+        </div>
+        <div class="ai-bubble">
+          <div class="ai-bubble-header">
+            <span class="ai-bubble-name">TherapyFind AI</span>
+            <span class="claude-badge">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Powered by Claude
+            </span>
+          </div>
+          <p class="ai-bubble-text">Hi there! Tell me what you're going through and where you're located. I'll find registered therapists in your area who are a great fit for you.</p>
+        </div>
+      </div>
+
+      <div class="ai-input-area">
+        <textarea
+          id="ai-input"
+          class="ai-textarea"
+          rows="3"
+          placeholder="e.g., I'm struggling with anxiety in Vancouver and would prefer telehealth sessions with a sliding scale..."
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();handleAISearch();}"
+        ></textarea>
+        <div class="ai-input-footer">
+          <span class="ai-hint">Press Enter to search &bull; Shift+Enter for new line</span>
+          <button class="ai-send-btn" onclick="handleAISearch()">
+            Find My Match
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-examples">
+        <span>Try:</span>
+        <a class="ai-example-chip" onclick="fillExample('anxiety therapist in Toronto, prefer telehealth')">Anxiety &middot; Toronto</a>
+        <a class="ai-example-chip" onclick="fillExample('couples therapy in Ottawa with sliding scale fees')">Couples &middot; Ottawa</a>
+        <a class="ai-example-chip" onclick="fillExample('French-speaking therapist for depression in Montréal')">Depression &middot; Montréal</a>
+        <a class="ai-example-chip" onclick="fillExample('trauma specialist in Vancouver, LGBTQ affirming')">Trauma &middot; Vancouver</a>
+        <a class="ai-example-chip" onclick="fillExample('teen therapist in Calgary, sliding scale')">Teens &middot; Calgary</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section id="stats">
+    <div class="stats-grid">
+      <div><div class="stat-num">1K+</div><div class="stat-label">Verified Therapists</div></div>
+      <div><div class="stat-num">55K+</div><div class="stat-label">Clients Helped</div></div>
+      <div><div class="stat-num">6+</div><div class="stat-label">Provinces Covered</div></div>
+      <div><div class="stat-num">4.9★</div><div class="stat-label">Average Rating</div></div>
+    </div>
+  </section>
+
+  <!-- AI Partnership Section -->
+  <section id="ai-partnership">
+    <div class="container-sm">
+      <div class="partnership-header">
+        <div class="partnership-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Our Technology Partnership
+        </div>
+        <h2 class="partnership-title">Smarter matching, powered by <span class="c">Claude AI</span></h2>
+        <p class="partnership-sub">We've partnered with Anthropic to bring Claude's AI understanding to mental health discovery. No rigid forms. No guesswork. Just describe how you're feeling and where you are—Claude reads your words and finds the right fit.</p>
+      </div>
+      <div class="partnership-grid">
+        <div class="partnership-card">
+          <div class="partnership-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <h3>Natural language</h3>
+          <p>Describe your situation the way you'd talk to a friend. Our AI understands full sentences, emotions, and context—not just keywords.</p>
+        </div>
+        <div class="partnership-card">
+          <div class="partnership-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+          <h3>Smart filtering</h3>
+          <p>Claude's AI reads your message and automatically applies the right filters—location, specialty, language preferences, and more.</p>
+        </div>
+        <div class="partnership-card">
+          <div class="partnership-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Privacy first</h3>
+          <p>Your search is never stored or shared. We extract only what's needed to find your match—nothing more, nothing less.</p>
+        </div>
+        <div class="partnership-card partnership-card-highlight">
+          <div class="partnership-anthropic-logo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            Anthropic &amp; Claude
+          </div>
+          <h3>Built on trust</h3>
+          <p>Claude is developed by Anthropic with safety and helpfulness at its core—exactly the foundation mental health technology deserves.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Browse by specialty -->
+  <section id="specialties" class="container-sm">
+    <div class="section-head">
+      <h2>Browse by specialty</h2>
+      <p>Or let our AI guide you—describe what you're going through in your own words above.</p>
+    </div>
+    <div class="spec-grid" id="spec-grid"></div>
+    <div style="text-align:center">
+      <button class="btn btn-outline" onclick="showPage('directory')">Browse all specialties &rarr;</button>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="container-sm">
+    <div class="section-head">
+      <h2>How TherapyFind works</h2>
+      <p>Our AI partnership with Claude makes finding the right therapist feel simple and human.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">01</div>
+        <div class="step-title">Tell our AI what you need</div>
+        <div class="step-desc">Describe how you're feeling and where you are. Our Claude-powered AI reads your words and understands your situation—no forms, no checkboxes, just a conversation.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">02</div>
+        <div class="step-title">Review matched profiles</div>
+        <div class="step-desc">Browse detailed profiles of registered therapists in your area. Read bios, check specialties, insurance coverage, session fees, and current availability.</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">03</div>
+        <div class="step-title">Connect directly</div>
+        <div class="step-desc">Reach out via phone or email. No middleman, no platform fees. You and your therapist, connected directly.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust -->
+  <section id="trust" class="container-sm">
+    <div class="trust-grid">
+      <div class="trust-card">
+        <div class="trust-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="trust-title">Registered &amp; verified</div>
+        <div class="trust-desc">Every therapist on TherapyFind holds a valid provincial registration. We verify credentials before any profile goes live.</div>
+      </div>
+      <div class="trust-card trust-card-ai">
+        <div class="trust-icon trust-icon-ai">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="trust-title">AI-matched to you</div>
+        <div class="trust-desc">Our partnership with Claude means the AI reads your needs and surfaces therapists most likely to help—not just those matching a single keyword.</div>
+        <div class="trust-claude-label">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Powered by Claude &bull; Anthropic
+        </div>
+      </div>
+      <div class="trust-card">
+        <div class="trust-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="trust-title">Real reviews</div>
+        <div class="trust-desc">Authentic ratings from real clients help you find therapists with a track record of making a meaningful difference.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Section -->
+  <section id="events">
+    <div class="container">
+      <div class="events-head">
+        <div>
+          <div class="events-label">Community Events</div>
+          <h2 class="events-title">Upcoming events &amp; workshops</h2>
+          <p class="events-sub">Join our community for free and paid events focused on mental wellness, healing, and connection. Open to all Canadians — wherever you are.</p>
+        </div>
+        <button class="btn btn-outline" onclick="">View all events &rarr;</button>
+      </div>
+      <div class="events-grid">
+
+        <div class="event-card">
+          <div class="event-img event-img-1">
+            <img src="https://images.unsplash.com/photo-1544027993-37dbfe43562a?w=700&q=80&fit=crop" alt="Person in a calm, mindful pose representing anxiety relief" loading="lazy"/>
+            <div class="event-badge">Webinar</div>
+            <div class="event-date-pill">May 8, 2026</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">Understanding Anxiety: Tools You Can Use Today</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 1:00 – 2:30 PM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Online (Zoom)</div>
+            </div>
+            <p class="event-desc">A 90-minute interactive webinar on evidence-based tools for managing anxiety. Learn CBT techniques, breathing practices, and grounding strategies you can apply immediately — led by a registered Canadian psychologist.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type free">Free</span>
+            <span class="event-register">Register now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-img event-img-2">
+            <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=700&q=80&fit=crop" alt="Couple sitting together and communicating" loading="lazy"/>
+            <div class="event-badge">Workshop</div>
+            <div class="event-date-pill">May 17, 2026</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">Couples Communication Workshop: Speak to Be Heard</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 10:00 AM – 1:00 PM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Toronto, ON</div>
+            </div>
+            <p class="event-desc">A hands-on 3-hour workshop for couples using Gottman-based communication skills, repair attempts, and emotional attunement — in a safe, supportive group setting led by a registered RMFT.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type paid">$75/couple</span>
+            <span class="event-register">Register now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-img event-img-3">
+            <img src="https://images.unsplash.com/photo-1573497019236-17f8177b81e8?w=700&q=80&fit=crop" alt="Inclusive diverse group of people in a supportive circle" loading="lazy"/>
+            <div class="event-badge">Support Group</div>
+            <div class="event-date-pill">Every Tuesday</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">2SLGBTQ+ Affirming Peer Support Circle</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 6:00 – 7:30 PM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Online (Zoom)</div>
+            </div>
+            <p class="event-desc">A weekly peer-facilitated support group for 2SLGBTQ+ individuals — led by a queer-affirming registered psychotherapist. A safe, inclusive space to share, connect, and feel less alone. All identities welcome.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type free">Free</span>
+            <span class="event-register">Join group <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-img event-img-4">
+            <img src="https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?w=700&q=80&fit=crop" alt="Soft natural light through trees, peaceful and reflective" loading="lazy"/>
+            <div class="event-badge">Seminar</div>
+            <div class="event-date-pill">May 24, 2026</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">Grief After Loss: Navigating the Unexpected Journey</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 2:00 – 4:00 PM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Online (Zoom)</div>
+            </div>
+            <p class="event-desc">A compassionate seminar on understanding grief, honouring loss, and finding meaning. Combines somatic practices with psychoeducation for a holistic, Canadian-context perspective on healing and moving forward.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type free">Free</span>
+            <span class="event-register">Register now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-img event-img-5">
+            <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=700&q=80&fit=crop" alt="Person meditating in a peaceful outdoor setting" loading="lazy"/>
+            <div class="event-badge">Course</div>
+            <div class="event-date-pill">Jun 7, 2026</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">Mindfulness-Based Stress Reduction: 4-Week Course</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Saturdays 9:00 – 11:00 AM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Hybrid (Ottawa + Online)</div>
+            </div>
+            <p class="event-desc">A structured 4-week MBSR course covering mindful breathing, body scan, mindful movement, and stress reactivity. Evidence-based and taught by certified Canadian instructors. Certificate of completion included.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type paid">$120 CAD / 4 weeks</span>
+            <span class="event-register">Enrol now <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-img event-img-6">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=700&q=80&fit=crop" alt="Men in a genuine, candid conversation" loading="lazy"/>
+            <div class="event-badge">Community</div>
+            <div class="event-date-pill">May 31, 2026</div>
+          </div>
+          <div class="event-body">
+            <div class="event-title">Men's Mental Health Open Forum: Breaking the Silence</div>
+            <div class="event-meta">
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 7:00 – 8:30 PM EDT</div>
+              <div class="event-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg> Online (Zoom)</div>
+            </div>
+            <p class="event-desc">An open, judgment-free conversation for men about mental health, masculinity, and asking for help. Hear from other Canadian men who've been there. No therapy jargon — just honest, real talk in a safe space.</p>
+          </div>
+          <div class="event-footer">
+            <span class="event-type free">Free</span>
+            <span class="event-register">Join forum <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+          </div>
+        </div>
+
+      </div>
+      <div class="events-cta-row">
+        <button class="btn btn-primary btn-lg" onclick="">View all events &rarr;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="container-sm cta-section">
+    <div class="cta-ai-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      Powered by Claude AI from Anthropic
+    </div>
+    <h2 style="font-family:var(--font-display);font-size:2rem;color:var(--text);margin-bottom:12px">Ready to find your therapist?</h2>
+    <p style="font-size:15px;color:var(--text2);margin-bottom:28px">Describe what you're looking for in your own words. Our AI will handle the matching.</p>
+    <button class="btn btn-primary btn-lg" onclick="window.scrollTo({top:0,behavior:'smooth'})">Try the AI Search &rarr;</button>
+  </section>
+
+  <footer>
+    <span>TherapyFind &mdash; Canadian Mental Health Directory &nbsp;&bull;&nbsp; AI Matching Powered by <a href="https://www.anthropic.com" target="_blank" rel="noopener noreferrer">Claude from Anthropic</a></span>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════ DIRECTORY PAGE ═══════════════════════════ -->
+<div id="dir-page">
+  <div class="dir-search-bar">
+    <div class="dir-search-inner">
+      <div class="search-input-wrap" style="flex:1;max-width:480px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input id="dir-query" type="text" placeholder="Specialty, name, or issue..." onkeydown="if(event.key==='Enter')applySearch()"/>
+      </div>
+      <div class="search-input-wrap" style="width:170px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <input id="dir-city" type="text" placeholder="City..." onkeydown="if(event.key==='Enter')applySearch()"/>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="applySearch()">Search</button>
+      <button class="btn btn-outline btn-sm mobile-filter-btn" onclick="openSidebar()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+        Filters <span id="filter-badge" style="display:none;background:var(--primary);color:#fff;border-radius:99px;padding:1px 6px;font-size:11px"></span>
+      </button>
+      <div class="dir-ai-badge">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        AI-matched
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <div class="dir-layout">
+    <aside class="sidebar" id="dir-sidebar">
+      <div class="sidebar-sticky">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            Refine Filters
+          </div>
+          <button class="btn-outline btn-sm sidebar-close" style="padding:4px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;color:var(--text2)" onclick="closeSidebar()">✕ Close</button>
+        </div>
+        <div class="sidebar-ai-note">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          AI has pre-applied filters from your description. Refine below.
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Province / Territory</div>
+          <select class="filter-select" id="f-province" onchange="applyFilters()"><option value="">All Provinces</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Specialty</div>
+          <select class="filter-select" id="f-specialty" onchange="applyFilters()"><option value="">Any Specialty</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Issue</div>
+          <select class="filter-select" id="f-issue" onchange="applyFilters()"><option value="">Any Issue</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Insurance / Benefits Plan</div>
+          <select class="filter-select" id="f-insurance" onchange="applyFilters()"><option value="">Any Provider</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Therapist Gender</div>
+          <select class="filter-select" id="f-gender" onchange="applyFilters()">
+            <option value="">Any Gender</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="non-binary">Non-Binary</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Session Cost (max)</div>
+          <select class="filter-select" id="f-cost" onchange="applyFilters()">
+            <option value="">Any Price</option>
+            <option value="100">Up to $100/session</option>
+            <option value="150">Up to $150/session</option>
+            <option value="200">Up to $200/session</option>
+            <option value="250">Up to $250/session</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Client Age Group</div>
+          <select class="filter-select" id="f-age" onchange="applyFilters()"><option value="">Any Age Group</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Language</div>
+          <select class="filter-select" id="f-lang" onchange="applyFilters()"><option value="">Any Language</option></select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">Options</div>
+          <div class="filter-checks">
+            <label class="check-label"><input type="checkbox" id="f-telehealth" onchange="applyFilters()"> Telehealth available</label>
+            <label class="check-label"><input type="checkbox" id="f-inperson" onchange="applyFilters()"> In-person available</label>
+            <label class="check-label"><input type="checkbox" id="f-sliding" onchange="applyFilters()"> Sliding scale fees</label>
+            <label class="check-label"><input type="checkbox" id="f-accepting" onchange="applyFilters()"> Accepting new clients</label>
+          </div>
+        </div>
+        <button class="clear-btn" id="clear-btn" onclick="clearFilters()">✕ Clear all filters</button>
+      </div>
+    </aside>
+
+    <div class="dir-main">
+      <div class="results-header">
+        <div class="results-count" id="results-count"><strong>0</strong> therapists found</div>
+        <div class="active-chips" id="active-chips"></div>
+      </div>
+      <div id="ai-match-banner" class="ai-match-banner" style="display:none"></div>
+      <div class="cards-grid" id="cards-grid"></div>
+      <div class="empty-state" id="empty-state" style="display:none">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <h3>No therapists found</h3>
+        <p>Try adjusting your filters or broadening your search.</p>
+        <button class="btn btn-outline btn-sm" onclick="clearFilters()">Clear all filters</button>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <footer style="margin-top:32px">
+    <span>TherapyFind &mdash; AI Matching Powered by <a href="https://www.anthropic.com" target="_blank" rel="noopener noreferrer">Claude from Anthropic</a></span>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════ PROFILE PAGE ═══════════════════════════ -->
+<div id="profile-page">
+  <div class="profile-layout">
+    <div class="profile-main" id="profile-main"></div>
+    <div id="profile-sidebar"></div>
+  </div>
+  <footer style="margin-top:32px">
+    <span>TherapyFind &mdash; AI Matching Powered by <a href="https://www.anthropic.com" target="_blank" rel="noopener noreferrer">Claude from Anthropic</a></span>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
